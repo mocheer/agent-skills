@@ -1,6 +1,6 @@
 ---
 name: rainfall-report
-description: 生成今日降雨站点简报 / 查询当前全省降雨情况 / 播报降雨超阈值站点信息。Dynamically scrapes rainfall real-time data from Fujian water resources platform via curl and generates structured rainfall situation reports in Chinese.
+description: 福建省汛情发布系统雨情简报生成 / 生成今日降雨站点简报 / 查询当前全省降雨情况 / 播报降雨超阈值站点信息 / 生成测站详细站点信息报告。Dynamically scrapes rainfall real-time data from Fujian water resources platform via curl and generates structured rainfall situation reports in Chinese.
 read_when:
   - 生成今日降雨站点简报
   - 查询当前全省降雨情况
@@ -12,31 +12,34 @@ allowed-tools: Bash(agent-browser:*)
 # 降雨站点简报生成
 
 ## 技能描述
-使用 Node.js 动态访问福建省水利信息平台的降雨监测页面，自动提取指定时间段内的全省降雨站点统计、超阈值县数、最大降雨点及最大小时雨量信息，并严格按照固定模板生成降雨简报。所有数值均来自实时采集的页面数据，杜绝人工填入或虚假生成。
+使用 Node.js 采集脚本动态访问福建省汛情发布系统的降雨监测页面，自动提取指定时间段内的全省降雨站点统计、超阈值县数、最大降雨点及最大小时雨量信息，并严格按照固定模板生成降雨简报。所有数值均来自实时采集的页面数据，杜绝人工填入或虚假生成。
 
 ## 触发意图
 当用户要求"生成今日降雨站点简报""查询当前全省降雨情况""播报降雨超阈值站点信息"等，或直接要求使用本技能动态获取数据并输出简报时调用。
 
 ## 数据采集流程
 
-### 1. 确定时间范围
+### 1. 确定参数（时间范围、测站编号、测站名称）
 - 若用户提供了明确的统计开始时间和结束时间，则使用用户指定的时间（格式 `YYYY-MM-DD HH:MM`）。
 - 如果用户没有明确指明要精确到分钟，那么开始时间需要向前取整，结束时间需要向后取整，忽略分钟和秒数。
   - 例如，用户指定 `2026-05-06T17:30:00`为结束时间，则实际统计时间为 `2026-05-06T18:00:00`。
 - 否则默认统计**当日**，开始时间为 `当日上午 06:00`，结束时间为 `当前系统小时数`（24 小时制，整点），确保简报反映从当日 6 时到最近整点的降雨状况。
+- 若用户提供了测站编号或名称，则使用用户指定的测站编号或名称，测站名称只需要保留名称，比如说"中沙站"请用"中沙"，如果用户没有提供测站编号或名称，则默认统计全省降雨情况。
 
 ### 2. 执行脚本
-- 当用户没有制定时间时使用node执行以下脚本
+- 当用户没有指定时间和测站时使用node执行以下脚本
   ```bash
   node ./scripts/reptile.js
   ```
-- 使用node执行以下脚本（需根据时间格式化参数）：
+- 当用户根据时间、测站编号、测站名称（参数可选）查询了解制定时间范围内某些测站数据时：
   ```bash
-  node ./scripts/reptile.js --start {start_time} --end {end_time}
+  node ./scripts/reptile.js --start {start_time} --end {end_time} --stcd {stcd} --stnm {stnm}
   ```
   参数范例
   start_time: 2026-05-06T06:00:00
   end_time: 2026-05-06T17:00:00
+  stcd: 500001
+  stnm: 中沙
 
 ### 3. 数据提取与映射
 
@@ -61,7 +64,7 @@ allowed-tools: Bash(agent-browser:*)
 - 若关键数据缺失（返回 null、0 或 NaN），注明"数据获取不完整"并停止输出，提示用户稍后重试。
 
 ## 输出模板
-严格按照以下格式输出，其中 `{}` 内的占位符替换为实际采集数据。
+当用户没有要求或者要求输出简报时必须严格按照以下格式输出，其中 `{}` 内的占位符替换为实际采集数据。
 
 ```
 {start_day}日{start_hour}时~{end_hour}时，全省共{total_stations}个站点降雨
@@ -95,3 +98,5 @@ allowed-tools: Bash(agent-browser:*)
 - 日期和小时不补零，保持与模板示例一致。
 - 输出结尾不加多余标点、空行，注意模板中"降雨"后换行，"毫米;"后无空格。
 - 如果用户提供了数据（如 JSON）作为补充，优先使用动态采集结果，用户数据仅用于交叉验证。
+- 雨量值保留 1 位小数，如果是 0 则显示 0；水位值保留 2 位小数；流量和库容保留 3 位有效数字；
+- 如果要生成表格，表格对齐方式为：数字右对值，时间居中，文本左对齐，如站址
