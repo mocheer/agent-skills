@@ -1,9 +1,9 @@
 ---
 name: reservoir-flood-report
-description: 生成今日水库汛情简报 / 查询当前水库蓄水情况 / 播报全省大中型水库水情。Dynamically scrapes reservoir real-time data from Fujian water resources platform via agent-browser and generates structured flood situation reports in Chinese.
+description: 福建省汛情发布系统水情简报生成 / 生成今日水库汛情简报  / 播报全省大中型水库水情。Dynamically scrapes reservoir real-time data from Fujian water resources platform via agent-browser and generates structured flood situation reports in Chinese.
 read_when:
+  - 福建省汛情发布系统水情简报生成
   - 生成今日水库汛情简报
-  - 查询当前水库蓄水情况
   - 播报全省大中型水库水情
 metadata: {"clawdbot":{"emoji":"🌊","requires":{"bins":["node","npm"]}}}
 allowed-tools: Bash(agent-browser:*)
