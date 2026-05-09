@@ -5,13 +5,13 @@ description: 批量安装所有子技能。执行后会自动将每个子目录�
 
 # 批量安装所有子技能
 
-## skills 技能列表
-- reservoir-flood-report
-- rainfall-report
-
 ## 安装步骤
 
-1. 遍历当前目录下的所有一级子目录（排除隐藏目录和文件）。
+1. 遍历当前目录下的所有一级子目录（当前目录为Github仓库agent-skills的根目录）。
 2. 对每个子目录，检查其中是否存在 `SKILL.md`。
 3. 若存在，则将该子目录视为一个独立技能，先检查当前环境是否已经存在该技能，如果不存在，则**按照标准流程安装**（例如复制技能目录到对应的技能目录），并确保能够自动触发执行。
 4. 输出安装结果汇总。
+
+## skills 技能列表
+- reservoir-flood-report
+- rainfall-report
