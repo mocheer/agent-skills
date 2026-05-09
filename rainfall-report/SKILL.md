@@ -41,6 +41,8 @@ allowed-tools: Bash(agent-browser:*)
   stcd: 500001
   stnm: 中沙
 
+> 不需要重复采集的数据内容
+
 ### 3. 数据提取与映射
 
 根据雨量数据分析总结，提取以下字段：
