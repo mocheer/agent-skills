@@ -1,5 +1,5 @@
 ---
-name: agent-skills-bundle
+name: agent-skills
 description: 批量安装所有子技能。执行后会自动将每个子目录中的技能安装到当前环境。
 ---
 
